@@ -292,4 +292,20 @@ public class LinkedList {
         }
         return ans;
 	}
-}
+	public void sort() {
+        for (int i = 0; i < size - 1; i++)
+		{
+            for (int j = 0; j < size - i - 1; j++) 
+			{
+                Node currentN = getNode(j);
+                Node nextN = currentN.next;
+                if (currentN.block.baseAddress > nextN.block.baseAddress) 
+				{
+                    MemoryBlock temp = currentN.block;
+                    currentN.block = nextN.block;
+                    nextN.block = temp;
+                }
+            }
+        }
+    }
+} 
