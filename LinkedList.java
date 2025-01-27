@@ -171,14 +171,14 @@ public class LinkedList {
 		//// Replace the following statement with your code
 		if (index < 0 || index >= size)
 		{
-			throw new IllegalArgumentException("Index must be between 0 and size");
+			throw new IllegalArgumentException("index must be between 0 and size");
 		}
-		Node current= first;
+		Node currentN= first;
 		for(int i=0;i<index;i++)
 		{
-			current= current.next;
+			currentN= currentN.next;
 		}
-		return current.block;
+		return currentN.block;
 	}	
 
 	/**
@@ -226,7 +226,7 @@ public class LinkedList {
 		{
 			first=first.next;
 		}
-		if(index==size-1)
+		else if(index==(size-1))
 		{
 			last=getNode(index-1);
 			last.next= null;
