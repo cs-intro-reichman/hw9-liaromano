@@ -1,4 +1,3 @@
-import javax.imageio.IIOException;
 
 /**
  * Represents a list of Nodes. 
@@ -285,21 +284,12 @@ public class LinkedList {
 	 */
 	public String toString() {
 		//// Replace the following statement with your code
-		if(first==null)
-		{
-			return "the list is empty";
-		}
-		else
-		{
-			String ans= "{";
-			Node currentN= first;
-			for(int i=0;i<size-1;i++)
-			{
-				ans= ans+ currentN.toString()+" ";
-				currentN= currentN.next;
-			}
-			ans= ans+ currentN.toString()+" -> null}";
-			return ans;
-		}
+		String ans = "";
+        Node currentN = first;
+        for(int i = 0 ; i < size ; i ++) {
+            ans = ans+ currentN.block.toString() + " "; 
+            currentN = currentN.next; 
+        }
+        return ans;
 	}
 }

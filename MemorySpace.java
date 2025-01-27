@@ -1,4 +1,3 @@
-import java.util.List;
 
 /**
  * Represents a managed memory space. The memory space manages a list of allocated 
@@ -61,35 +60,34 @@ public class MemorySpace {
 	 */
 	public int malloc(int length) {		
 		//// Replace the following statement with your code
-		if(length <= 0) {
-			return -1;  
+		if(length<=0)
+		{
+			return -1;
 		}
 		Node currentN = freeList.getFirst();   
-		 Node save = null;
-		  while (currentN != null) 
-		  {
-			if (currentN.block.length >= length) 
+		while (currentN!=null)
+		{
+			MemoryBlock freeB= currentN.block;
+			if(freeB.length>=length)
 			{
-				save = currentN;
-				break; 
+				if(freeB.length==length)
+				{
+					freeList.remove(currentN.block);
+					allocatedList.addLast(new MemoryBlock(freeB.baseAddress, freeB.length));
+					return freeB.baseAddress;
+				}
+				else
+				{
+					MemoryBlock allocatedB= new MemoryBlock(freeB.baseAddress, length);
+					allocatedList.addLast(allocatedB);
+					freeB.baseAddress= freeB.baseAddress+ length;
+					freeB.length-= length;
+				}
 			}
-			currentN = currentN.next;
+			currentN= currentN.next;
 		}
-		 if (save != null)
-		  {
-			 int address = save.block.baseAddress;
-			 MemoryBlock newBlock = new MemoryBlock(address, length);
-			 allocatedList.addLast(newBlock);
-			 save.block.length -= length;
-			 if (save.block.length == 0) {
-				 freeList.remove(save);
-			 }
-	 
-			 return address;
-		 }
-		 return -1; 
-		}
-
+		return -1;
+	}
 	/**
 	 * Frees the memory block whose base address equals the given address.
 	 * This implementation deletes the block whose base address equals the given 
