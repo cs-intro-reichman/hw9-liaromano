@@ -63,13 +63,15 @@ public class MemorySpace {
         Node currentN = freeList.getFirst();
         Node save = null;
         while(currentN != null) {
-            if(currentN.block.length >= length) {
+            if(currentN.block.length >= length)
+			{
                 save = currentN;
                 break;
             }
             currentN=currentN.next;
         }
-        if(save != null) {
+        if(save != null) 
+		{
             MemoryBlock newBlock = new MemoryBlock(save.block.baseAddress , length);
             allocatedList.addLast(newBlock);
             save.block.length -= length;
@@ -94,14 +96,16 @@ public class MemorySpace {
      */
     public void free(int address) {
         //// Write your code here
-        if(freeList.getSize() == 1 && freeList.getFirst().block.baseAddress == 0 && freeList.getFirst().block.length == 100) {
-            throw new IllegalArgumentException(
-                    "index must be between 0 and size");
+        if(freeList.getSize() == 1 && freeList.getFirst().block.baseAddress == 0 && freeList.getFirst().block.length == 100) 
+		{
+            throw new IllegalArgumentException("index must be between 0 and size");
         }
         Node currentN = allocatedList.getNode(0);
         Node save = null;
-        while(currentN != null) {
-            if(currentN.block.baseAddress == address) {
+        while(currentN != null) 
+		{
+            if(currentN.block.baseAddress == address) 
+			{
                 save = currentN;
                 break;
             }
@@ -153,5 +157,4 @@ public class MemorySpace {
         }
         
     }
-    
 } 
