@@ -1,3 +1,5 @@
+import java.util.List;
+
 /**
  * Represents a managed memory space. The memory space manages a list of allocated 
  * memory blocks, and a list free memory blocks. The methods "malloc" and "free" are 
@@ -59,6 +61,34 @@ public class MemorySpace {
 	 */
 	public int malloc(int length) {		
 		//// Replace the following statement with your code
+		if(length<=0)
+		{
+			return -1;
+		}
+		Node currentN = freeList.getFirst();   
+		while (currentN!=null)
+		{
+			MemoryBlock currentB= currentN.block;
+			if(currentB.length>=length)
+			{
+				if(currentB.length==length)
+				{
+					freeList.remove(currentN.block);
+					MemoryBlock addB= new MemoryBlock(currentB.baseAddress, currentB.length);
+					allocatedList.addLast(addB);
+					return currentB.baseAddress;
+				}
+				else
+				{
+					MemoryBlock allocatedB= new MemoryBlock(currentB.baseAddress, length);
+					allocatedList.addLast(allocatedB);
+					currentB.baseAddress= currentB.baseAddress+ length;
+					currentB.length= currentB.length- length;
+					return allocatedB.baseAddress;
+				}
+			}
+			currentN= currentN.next;
+		}
 		return -1;
 	}
 
@@ -72,6 +102,21 @@ public class MemorySpace {
 	 */
 	public void free(int address) {
 		//// Write your code here
+		if(allocatedList.getSize()==0)
+		{
+			throw new IllegalArgumentException("index must be between 0 and size");
+		}
+		Node currentN= allocatedList.getFirst();
+		while(currentN!=null)
+		{
+			if(currentN.block.baseAddress==address)
+			{
+				allocatedList.remove(currentN.block);
+				freeList.addLast(currentN.block);
+				break;
+			}
+			currentN= currentN.next;
+		}
 	}
 	
 	/**
@@ -89,5 +134,34 @@ public class MemorySpace {
 	 */
 	public void defrag() {
 		//// Write your code here
+		Node currentN= freeList.getFirst();
+		boolean flag1= true;
+		boolean flag2= true;
+		while (currentN!=null) 
+		{
+			Node check= freeList.getFirst();
+			while (check!=null)
+			{
+				if(currentN.block.baseAddress+ currentN.block.length== check.block.baseAddress)
+				{
+					currentN.block.length= currentN.block.length+ check.block.length;
+					Node toRemove= check;
+					check= check.next;
+					freeList.remove(toRemove.block);
+					flag1= false;
+					flag2= false;
+				}
+				if(flag2)
+				{
+					check=check.next;
+				}
+				flag2=true;
+			}
+			if (flag1)
+			{
+				currentN= currentN.next;
+			}
+			flag1= true;
+		}
 	}
 }
