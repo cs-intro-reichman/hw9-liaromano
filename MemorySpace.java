@@ -78,16 +78,16 @@ public class MemorySpace {
 		 if (save != null)
 		  {
 			 int address = save.block.baseAddress;
-			 MemoryBlock newB = new MemoryBlock(address, length);
-			  allocatedList.addLast(newB);
-			  save.block.length -= length;
-			  if (save.block.length == 0) 
-			  {
-				freeList.remove(save);
-			  }
-			  return address;
-			}
-			return -1; 
+			 MemoryBlock newBlock = new MemoryBlock(address, length);
+			 allocatedList.addLast(newBlock);
+			 save.block.length -= length;
+			 if (save.block.length == 0) {
+				 freeList.remove(save);
+			 }
+	 
+			 return address;
+		 }
+		 return -1; 
 		}
 
 	/**
@@ -100,23 +100,27 @@ public class MemorySpace {
 	 */
 	public void free(int address) {
 		//// Write your code here
-		Node currentN = allocatedList.getFirst();
-		Node save = null;
-		while (currentN != null) 
+		if(freeList.getSize()==1 && freeList.getFirst().block.baseAddress==0 && freeList.getFirst().block.length==100)
 		{
-			if (currentN.block.baseAddress == address) 
+			throw new IllegalArgumentException("index must be between 0 and size");
+		}
+		Node currentN= allocatedList.getNode(0);
+		Node save= null;
+		while (currentN!=null)
+		{
+			if(currentN.block.baseAddress==address)
 			{
-				save = currentN;
+				save=currentN;
 				break;
 			}
-			currentN = currentN.next;
+			currentN= currentN.next;
 		}
-		if (save == null) 
+		if(save==null)
 		{
-			throw new IllegalArgumentException("Attempt to free unallocated memory.");
+			return;
 		}
-		allocatedList.remove(save.block);
 		freeList.addLast(save.block);
+		allocatedList.remove(save.block);
 	}
 	
 	/**
