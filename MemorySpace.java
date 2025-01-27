@@ -61,31 +61,34 @@ public class MemorySpace {
 	 */
 	public int malloc(int length) {		
 		//// Replace the following statement with your code
+		if(length <= 0) {
+			return -1;  
+		}
 		Node currentN = freeList.getFirst();   
-    Node save = null;
-    
-    while (currentN != null) {
-        if (currentN.block.length >= length) {
-            save = currentN;
-            break;
-        }
-        currentN = currentN.next;
-    }
-
-    if (save != null)
-	 {
-        int address = save.block.baseAddress;
-        MemoryBlock newB = new MemoryBlock(address, length);
-        allocatedList.addLast(newB);
-        save.block.length -= length;
-        if (save.block.length == 0) 
-		{
-            freeList.remove(save);
-        }
-        return address;
-    }
-    return -1; 
-}
+		 Node save = null;
+		  while (currentN != null) 
+		  {
+			if (currentN.block.length >= length) 
+			{
+				save = currentN;
+				break; 
+			}
+			currentN = currentN.next;
+		}
+		 if (save != null)
+		  {
+			 int address = save.block.baseAddress;
+			 MemoryBlock newB = new MemoryBlock(address, length);
+			  allocatedList.addLast(newB);
+			  save.block.length -= length;
+			  if (save.block.length == 0) 
+			  {
+				freeList.remove(save);
+			  }
+			  return address;
+			}
+			return -1; 
+		}
 
 	/**
 	 * Frees the memory block whose base address equals the given address.
@@ -97,24 +100,20 @@ public class MemorySpace {
 	 */
 	public void free(int address) {
 		//// Write your code here
-		if(allocatedList.getSize()==0)
+		Node currentN = allocatedList.getFirst();
+		Node save = null;
+		while (currentN != null) 
 		{
-			throw new IllegalArgumentException("no allocated blocks to free");
-		}
-		Node currentN= allocatedList.getFirst();
-		Node save= null;
-		while(currentN!=null)
-		{
-			if(currentN.block.baseAddress==address)
+			if (currentN.block.baseAddress == address) 
 			{
-				save= currentN;
+				save = currentN;
 				break;
 			}
-			currentN= currentN.next;
+			currentN = currentN.next;
 		}
-		if(save==null)
+		if (save == null) 
 		{
-			return;
+			throw new IllegalArgumentException("Attempt to free unallocated memory.");
 		}
 		allocatedList.remove(save.block);
 		freeList.addLast(save.block);
@@ -136,16 +135,18 @@ public class MemorySpace {
 	public void defrag() {
 		//// Write your code here
 		Node currentN = freeList.getFirst();
-		while (currentN != null)
-		 {
-			MemoryBlock currentB = currentN.block;
+		while (currentN != null) 
+		{
+			MemoryBlock currentBlock = currentN.block;
 			Node nextN = currentN.next;
-			while (nextN != null) {
+			while (nextN != null) 
+			{
 				MemoryBlock nextBlock = nextN.block;
-				if (currentB.baseAddress + currentB.length == nextBlock.baseAddress) {
-					currentB.length = currentB.length+ nextBlock.length;
-					freeList.remove(nextN);  
-					break;  
+				if (currentBlock.baseAddress + currentBlock.length == nextBlock.baseAddress) 
+				{
+					currentBlock.length = currentBlock.length+ nextBlock.length;
+					freeList.remove(nextN); 
+					break; 
 				}
 				nextN = nextN.next;
 			}
