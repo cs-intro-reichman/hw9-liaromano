@@ -66,28 +66,28 @@ public class MemorySpace {
 			return -1;
 		}
 		Node currentN = freeList.getFirst();   
+		Node save= null;
 		while (currentN!=null)
 		{
-			MemoryBlock currentB= currentN.block;
-			if(currentB.length>=length)
+			if(currentN.block.length>=length)
 			{
-				if(currentB.length==length)
-				{
-					freeList.remove(currentN.block);
-					MemoryBlock addB= new MemoryBlock(currentB.baseAddress, currentB.length);
-					allocatedList.addLast(addB);
-					return currentB.baseAddress;
-				}
-				else
-				{
-					MemoryBlock allocatedB= new MemoryBlock(currentB.baseAddress, length);
-					allocatedList.addLast(allocatedB);
-					currentB.baseAddress= currentB.baseAddress+ length;
-					currentB.length= currentB.length- length;
-					return allocatedB.baseAddress;
-				}
+				save=currentN;
+				break;
 			}
 			currentN= currentN.next;
+		}
+		if(save!=null)
+		{
+			MemoryBlock newB= new MemoryBlock(save.block.baseAddress, length);
+			allocatedList.addLast(newB);
+			save.block.length -= length;
+			int adress= save.block.baseAddress;
+			save.block.baseAddress= length;
+			if(save.block.length==0)
+			{
+				freeList.remove(save);
+			}
+			return adress;
 		}
 		return -1;
 	}
@@ -107,16 +107,22 @@ public class MemorySpace {
 			throw new IllegalArgumentException("index must be between 0 and size");
 		}
 		Node currentN= allocatedList.getFirst();
+		Node save= null;
 		while(currentN!=null)
 		{
 			if(currentN.block.baseAddress==address)
 			{
-				allocatedList.remove(currentN.block);
-				freeList.addLast(currentN.block);
+				save= currentN;
 				break;
 			}
 			currentN= currentN.next;
 		}
+		if(save==null)
+		{
+			return;
+		}
+		allocatedList.remove(save.block);
+		freeList.addLast(save.block);
 	}
 	
 	/**
@@ -134,34 +140,27 @@ public class MemorySpace {
 	 */
 	public void defrag() {
 		//// Write your code here
-		Node currentN= freeList.getFirst();
-		boolean flag1= true;
-		boolean flag2= true;
-		while (currentN!=null) 
+		if(freeList.getSize()<=1)
 		{
-			Node check= freeList.getFirst();
-			while (check!=null)
+			return;
+		}
+		for(int i=0;i<freeList.getSize();i++)
+		{
+			MemoryBlock currentB= freeList.getBlock(i);
+			int lastAddress= currentB.baseAddress+ currentB.length;
+			Node currentN= freeList.getFirst();
+			while(currentN!=null)
 			{
-				if(currentN.block.baseAddress+ currentN.block.length== check.block.baseAddress)
+				MemoryBlock nextB= currentN.block;
+				if(nextB.baseAddress==lastAddress)
 				{
-					currentN.block.length= currentN.block.length+ check.block.length;
-					Node toRemove= check;
-					check= check.next;
-					freeList.remove(toRemove.block);
-					flag1= false;
-					flag2= false;
+					currentB.length= currentB.length+ nextB.length;
+					freeList.remove(currentN);
+					defrag();
+					break;
 				}
-				if(flag2)
-				{
-					check=check.next;
-				}
-				flag2=true;
-			}
-			if (flag1)
-			{
 				currentN= currentN.next;
 			}
-			flag1= true;
 		}
 	}
 }
