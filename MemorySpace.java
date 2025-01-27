@@ -140,10 +140,6 @@ public class MemorySpace {
 	 */
 	public void defrag() {
 		//// Write your code here
-		if(freeList.getSize()<=1)
-		{
-			return;
-		}
 		for(int i=0;i<freeList.getSize();i++)
 		{
 			MemoryBlock currentB= freeList.getBlock(i);
